@@ -145,17 +145,34 @@
     <script src="app.js"></script>
 <script>
   function clasificarClientes() {
-    fetch('/analizar-clientes')
-      .then(res => res.json())
-      .then(data => {
-        const analisisDiv = document.getElementById("analysisContent");
-        analisisDiv.innerHTML = '<h3>Resultados de Clasificación</h3><ul>' + 
-          data.map(c => `<li>${c.nombre || 'Cliente'} → ${c.grupo}</li>`).join('') + 
-          '</ul>';
-      })
-      .catch(err => alert("Error al clasificar: " + err));
+    if (!processedData || processedData.length === 0) {
+      alert("No hay datos cargados para clasificar.");
+      return;
+    }
+
+    // Simulación simple: clasifica en 3 grupos según la cantidad de compras o total
+    const datos = processedData.map(cliente => {
+      const valor = parseFloat(cliente.compras || cliente.total || 0) || 0;
+      return { ...cliente, valor };
+    });
+
+    // Ordenar por valor
+    datos.sort((a, b) => a.valor - b.valor);
+
+    const grupoSize = Math.ceil(datos.length / 3);
+
+    for (let i = 0; i < datos.length; i++) {
+      datos[i].grupo = "Grupo " + (Math.floor(i / grupoSize) + 1);
+    }
+
+    // Mostrar en pantalla
+    const analisisDiv = document.getElementById("analysisContent");
+    analisisDiv.innerHTML = '<h3>Resultados de Clasificación</h3><ul>' + 
+      datos.map(c => `<li>${c.nombre || 'Cliente'} → ${c.grupo}</li>`).join('') + 
+      '</ul>';
   }
 </script>
+
 </body>
 <div id="splashScreen">
     <h1 class="splash-title">Datark 📊</h1>
